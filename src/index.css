@@ -1,0 +1,236 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-gold-50: 253 251 247;
+  --color-gold-100: 250 246 237;
+  --color-gold-200: 244 228 166;
+  --color-gold-300: 229 199 107;
+  --color-gold-400: 212 175 55;
+  --color-gold-500: 201 162 39;
+  --color-gold-600: 184 152 32;
+  --color-gold-700: 160 134 27;
+  --color-gold-800: 135 106 21;
+  --color-gold-900: 107 84 16;
+  --color-primary-50: 253 251 247;
+  --color-primary-100: 250 246 237;
+  --color-primary-200: 244 228 166;
+  --color-primary-300: 229 199 107;
+  --color-primary-400: 212 175 55;
+  --color-primary-500: 201 162 39;
+  --color-primary-600: 184 152 32;
+  --color-primary-700: 160 134 27;
+  --color-primary-800: 135 106 21;
+  --color-primary-900: 107 84 16;
+  --color-dark-50: 245 245 245;
+  --color-dark-100: 232 232 232;
+  --color-dark-200: 209 209 209;
+  --color-dark-300: 180 180 180;
+  --color-dark-400: 139 139 139;
+  --color-dark-500: 102 102 102;
+  --color-dark-600: 36 36 36;
+  --color-dark-700: 30 30 30;
+  --color-dark-800: 24 24 24;
+  --color-dark-900: 18 18 18;
+  --app-text-strong: #f8f5ea;
+  --app-text-body: #e1ddcf;
+  --app-text-muted: #c5c0b4;
+  --app-text-subtle: #9d988e;
+  --app-on-accent: #15130d;
+  --app-border: rgba(212, 175, 55, 0.22);
+  --app-background: #121212;
+  --app-background-accent: rgba(212, 175, 55, 0.08);
+  --app-scrollbar-track: #181818;
+  --app-success: #86efac;
+  --app-danger: #fca5a5;
+  --app-warning: #fde68a;
+  color: var(--app-text-body);
+  background: var(--app-background);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at 20% 50%, var(--app-background-accent), transparent 35%),
+    radial-gradient(circle at 80% 80%, color-mix(in srgb, var(--app-background-accent) 70%, transparent), transparent 35%),
+    linear-gradient(135deg, rgb(var(--color-dark-900)) 0%, rgb(var(--color-dark-800)) 34%, rgb(var(--color-dark-700)) 68%, rgb(var(--color-dark-900)) 100%);
+  color: var(--app-text-body);
+  min-height: 100vh;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--app-scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgb(var(--color-gold-400)) 0%, rgb(var(--color-gold-500)) 100%);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgb(var(--color-gold-300)) 0%, rgb(var(--color-gold-400)) 100%);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: Georgia, 'Times New Roman', ui-serif, serif;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid rgb(var(--color-gold-400));
+  outline-offset: 2px;
+}
+
+::placeholder {
+  color: var(--app-text-subtle);
+}
+
+* {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* Adapta classes antigas do projeto aos temas configuráveis. */
+.bg-white,
+.bg-gray-50,
+.bg-gray-100,
+.bg-gray-200 {
+  background-color: rgb(var(--color-dark-700)) !important;
+}
+
+.text-black,
+.text-gray-900,
+.text-gray-800,
+.text-gray-700,
+.text-gray-100,
+.text-gray-200 {
+  color: var(--app-text-strong) !important;
+}
+
+.text-gray-600,
+.text-gray-500,
+.text-gray-300 {
+  color: var(--app-text-body) !important;
+}
+
+.text-gray-400 {
+  color: var(--app-text-muted) !important;
+}
+
+.text-dark-900,
+.text-dark-800,
+.text-dark-700,
+.text-dark-600 {
+  color: var(--app-on-accent) !important;
+}
+
+.border-gray-100,
+.border-gray-200,
+.border-gray-300,
+.border-gray-400 {
+  border-color: var(--app-border) !important;
+}
+
+.text-pink-500,
+.text-pink-600,
+.text-pink-700 {
+  color: rgb(var(--color-gold-400)) !important;
+}
+
+.border-pink-100,
+.border-pink-200,
+.border-pink-500 {
+  border-color: color-mix(in srgb, rgb(var(--color-gold-400)) 30%, transparent) !important;
+}
+
+.bg-pink-50 {
+  background-color: color-mix(in srgb, rgb(var(--color-gold-400)) 8%, transparent) !important;
+}
+
+.bg-pink-100 {
+  background-color: color-mix(in srgb, rgb(var(--color-gold-400)) 12%, transparent) !important;
+}
+
+.hover\:bg-pink-600:hover {
+  background-color: rgb(var(--color-gold-400)) !important;
+}
+
+.bg-red-50 {
+  background-color: color-mix(in srgb, var(--app-danger) 14%, transparent) !important;
+}
+
+.bg-green-50 {
+  background-color: color-mix(in srgb, var(--app-success) 14%, transparent) !important;
+}
+
+.bg-yellow-50 {
+  background-color: color-mix(in srgb, var(--app-warning) 18%, transparent) !important;
+}
+
+.text-red-700,
+.text-red-600,
+.text-red-500,
+.text-red-400 {
+  color: var(--app-danger) !important;
+}
+
+.text-green-700,
+.text-green-600,
+.text-green-500,
+.text-green-400,
+.text-green-300 {
+  color: var(--app-success) !important;
+}
+
+.text-yellow-700,
+.text-yellow-600,
+.text-yellow-500 {
+  color: var(--app-warning) !important;
+}
+
+.border-red-200,
+.border-red-100,
+.border-red-400 {
+  border-color: color-mix(in srgb, var(--app-danger) 40%, transparent) !important;
+}
+
+.border-green-200,
+.border-green-100,
+.border-green-300 {
+  border-color: color-mix(in srgb, var(--app-success) 40%, transparent) !important;
+}
+
+.border-yellow-200,
+.border-yellow-100 {
+  border-color: color-mix(in srgb, var(--app-warning) 40%, transparent) !important;
+}
