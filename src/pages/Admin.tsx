@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import { defaultSiteConfig, normalizeSiteConfig, SiteConfig, SiteService } from "../content/siteContent";
 import { DEFAULT_PROFESSIONAL_IMAGE, DEFAULT_WHATSAPP_TEMPLATE } from "../config/appConfig";
 import { loadSiteConfigFromDatabase, saveSiteConfigToDatabase } from "../services/siteConfig";
-import { saveTemplatePreferences } from "../services/templatePreferences";
+import { loadTemplatePreferences, saveTemplatePreferences } from "../services/templatePreferences";
 import TemplateEditorSection from "../components/admin/TemplateEditorSection";
 import {
   MonthlySchedule,
@@ -13,6 +13,12 @@ import {
   WeeklyRule,
   WeekDay,
 } from "../components/schedule/types";
+import {
+  ThemeColors,
+  applyThemeColors,
+  getDefaultThemeColors,
+  normalizeThemeColors,
+} from "../utils/themeColors";
 
 // ============================================
 // CONSTANTES
@@ -103,6 +109,7 @@ interface Service {
   name: string;
   duration: string;
   price: string;
+  status?: 'active' | 'inactive';
 }
 
 interface DaySchedule {
@@ -196,6 +203,8 @@ type DatabaseService = {
   name: string | null;
   duration: number | string | null;
   price: number | string | null;
+  active?: boolean | null;
+  status?: string | null;
 };
 
 type DatabaseAppointment = {
@@ -500,6 +509,7 @@ const mapDatabaseProfessional = (
         name: service.name || "",
         duration: `${parseDurationToNumber(String(service.duration || 30))} min`,
         price: formatPriceFromDatabase(service.price),
+        status: toStatusForApp(service.status, service.active),
       })),
     schedule: weeklyRulesToLegacySchedule(weeklyRules),
     monthlySchedules: buildMonthlySchedulesFromDatabase(weeklyRules, blocks),
@@ -1857,16 +1867,19 @@ const ServiceModal = ({
   onClose,
 }: {
   service: Service | null;
-  onSave: (data: { name: string; duration: string; price: string }) => void;
+  onSave: (data: { name: string; duration: string; price: string; status: 'active' | 'inactive' }) => void;
   onClose: () => void;
 }) => {
   const [name, setName] = useState(service?.name || "");
   const [duration, setDuration] = useState(service?.duration || "");
   const [price, setPrice] = useState(service?.price || "");
+  const [status, setStatus] = useState<'active' | 'inactive'>(service?.status || 'active');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ name, duration, price });
+    const durationNumber = Number(String(duration).replace(/\D/g, ''));
+    if (!name.trim() || !durationNumber || durationNumber <= 0) return;
+    onSave({ name: name.trim(), duration, price, status });
   };
 
   return (
@@ -1922,6 +1935,20 @@ const ServiceModal = ({
                 required
               />
             </div>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">
+              Status
+            </label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as 'active' | 'inactive')}
+              className="w-full rounded-xl border border-gold-400/20 px-3 py-2 text-sm outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/30"
+            >
+              <option value="active">Ativo</option>
+              <option value="inactive">Inativo</option>
+            </select>
           </div>
 
           <div className="grid grid-cols-2 gap-2 pt-1">
@@ -2023,6 +2050,9 @@ const Admin = () => {
     "por-profissional" | "base-geral"
   >("por-profissional");
   const [siteConfig, setSiteConfig] = useState<SiteConfig>(defaultSiteConfig);
+  const [themeColors, setThemeColors] = useState<ThemeColors>(() =>
+    loadTemplatePreferences().themeColors,
+  );
   const [siteConfigSaved, setSiteConfigSaved] = useState(false);
   const [adminSection, setAdminSection] = useState<"template" | "professionals">("template");
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -2051,6 +2081,7 @@ const Admin = () => {
       setProfessionals([]);
       setAppointments([]);
       setSiteConfig(defaultSiteConfig);
+      setThemeColors(getDefaultThemeColors(defaultSiteConfig.themeId));
       setIsLoadingData(false);
       setDatabaseMessage("Armazenamento local iniciado.");
       return;
@@ -2076,8 +2107,16 @@ const Admin = () => {
       setAppointments(databaseAppointments);
       setBlockedClients(databaseBlockedClients);
       setBlockedProfessionalId((current) => current || databaseProfessionals[0]?.id || "");
+      const preferences = loadTemplatePreferences();
+      const nextThemeColors = normalizeThemeColors(
+        preferences.themeColors,
+        databaseState?.siteConfig?.themeId || preferences.paletteId,
+      );
+
       setSiteConfig(normalizeSiteConfig(databaseState?.siteConfig));
+      setThemeColors(nextThemeColors);
     } catch (error) {
+      setDatabaseMessage("Erro ao salvar as cores do site.");
       console.error("Erro ao carregar dados locais:", error);
       setProfessionals([]);
       setAppointments([]);
@@ -2093,6 +2132,10 @@ const Admin = () => {
   useEffect(() => {
     loadAdminData();
   }, []);
+
+  useEffect(() => {
+    applyThemeColors(themeColors, siteConfig.themeId);
+  }, [siteConfig.themeId, themeColors]);
 
   useEffect(() => {
     const tab = new URLSearchParams(location.search).get("tab");
@@ -2378,8 +2421,8 @@ const Admin = () => {
     setSiteConfigSaved(false);
   };
 
-  const updateTemplateConfig = (config: SiteConfig) => {
-    setSiteConfig(normalizeSiteConfig(config));
+  const updateTemplateConfig = (colors: ThemeColors) => {
+    setThemeColors(normalizeThemeColors(colors, siteConfig.themeId));
     setSiteConfigSaved(false);
   };
 
@@ -2427,31 +2470,25 @@ const Admin = () => {
   const handleSaveSiteConfig = async () => {
     try {
       const normalizedConfig = normalizeSiteConfig(siteConfig);
+      const normalizedThemeColors = normalizeThemeColors(
+        themeColors,
+        normalizedConfig.themeId,
+      );
 
       await saveAdminStateToDatabase(normalizedConfig);
       saveTemplatePreferences({
         segmentId: normalizedConfig.segmentId,
         paletteId: normalizedConfig.themeId,
+        themeColors: normalizedThemeColors,
       });
-
-      await Promise.all(
-        professionals.map((professional) =>
-          localDataClient
-            .from("professionals")
-            .update({
-              name: professional.name?.trim() || defaultSiteConfig.messages.professionalFallbackName,
-              specialty:
-                professional.specialty?.trim() ||
-                defaultSiteConfig.messages.professionalFallbackSpecialty,
-            })
-            .eq("id", String(professional.id)),
-        ),
-      );
-
       setSiteConfig(normalizedConfig);
+      setThemeColors(normalizedThemeColors);
+      applyThemeColors(normalizedThemeColors, normalizedConfig.themeId);
+      setDatabaseMessage("Cores do site salvas localmente.");
       setSiteConfigSaved(true);
       setDatabaseMessage("Configurações salvas localmente.");
       window.setTimeout(() => setSiteConfigSaved(false), 2500);
+      window.setTimeout(() => setDatabaseMessage("Cores do site salvas localmente."), 0);
     } catch (error) {
       console.error("Erro ao salvar configurações:", error);
       setDatabaseMessage("Erro ao salvar configurações.");
@@ -2465,6 +2502,29 @@ const Admin = () => {
       )
     )
       return;
+
+    const normalizedConfig = normalizeSiteConfig(siteConfig);
+    const defaultThemeColors = getDefaultThemeColors(normalizedConfig.themeId);
+
+    setThemeColors(defaultThemeColors);
+    saveTemplatePreferences({
+      segmentId: normalizedConfig.segmentId,
+      paletteId: normalizedConfig.themeId,
+      themeColors: defaultThemeColors,
+    });
+    applyThemeColors(defaultThemeColors, normalizedConfig.themeId);
+
+    try {
+      await saveAdminStateToDatabase(normalizedConfig);
+      setSiteConfigSaved(true);
+      setDatabaseMessage("Cores padrÃ£o restauradas.");
+      window.setTimeout(() => setSiteConfigSaved(false), 2500);
+    } catch (error) {
+      console.error("Erro ao restaurar as cores:", error);
+      setDatabaseMessage("Erro ao restaurar as cores do site.");
+    }
+
+    return;
 
     const normalizedDefault = normalizeSiteConfig(defaultSiteConfig);
     setSiteConfig(normalizedDefault);
@@ -2664,6 +2724,7 @@ const Admin = () => {
     name: string;
     duration: string;
     price: string;
+    status: 'active' | 'inactive';
   }) => {
     if (!selectedProfessional) return;
 
@@ -2673,6 +2734,8 @@ const Admin = () => {
         name: data.name,
         duration: parseDurationToNumber(data.duration),
         price: parsePriceToNumber(data.price),
+        active: data.status === 'active',
+        status: data.status,
       };
 
       const { error } = editingService
@@ -2801,7 +2864,7 @@ const Admin = () => {
         <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
           <div className="flex gap-2 overflow-x-auto py-3">
             {[
-              { key: "template", label: "Editor do Template" },
+              { key: "template", label: "Cores do Site" },
               { key: "professionals", label: "Profissionais" },
             ].map((section: { key: "template" | "professionals"; label: string }) => (
               <button
@@ -2840,6 +2903,7 @@ const Admin = () => {
         <TemplateEditorSection
           config={siteConfig}
           saved={siteConfigSaved}
+          themeColors={themeColors}
           onChange={updateTemplateConfig}
           onSave={handleSaveSiteConfig}
           onReset={handleResetSiteConfig}
@@ -3099,6 +3163,10 @@ const Admin = () => {
                                       <span>•</span>
                                       <span className="font-medium text-gray-200">
                                         {service.price}
+                                      </span>
+                                      <span>•</span>
+                                      <span className={service.status === 'inactive' ? 'text-red-400' : 'text-green-400'}>
+                                        {service.status === 'inactive' ? 'Inativo' : 'Ativo'}
                                       </span>
                                     </div>
                                   </div>

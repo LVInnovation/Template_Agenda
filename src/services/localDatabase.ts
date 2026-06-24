@@ -14,11 +14,93 @@ const uuid = () =>
 
 const now = () => new Date().toISOString();
 
+
+const DEMO_PROFESSIONALS: Row[] = [
+  {
+    id: 'demo-ana-clara',
+    name: 'Ana Clara',
+    specialty: 'Especialista em Beleza',
+    photo_url: null,
+    image: null,
+    active: true,
+    status: 'active',
+    whatsapp_message: 'Olá! Seu agendamento com Ana Clara foi confirmado.',
+    allow_simultaneous_appointments: false,
+    created_at: now(),
+  },
+  {
+    id: 'demo-beatriz-souza',
+    name: 'Beatriz Souza',
+    specialty: 'Manicure e Estética',
+    photo_url: null,
+    image: null,
+    active: true,
+    status: 'active',
+    whatsapp_message: 'Olá! Seu agendamento com Beatriz Souza foi confirmado.',
+    allow_simultaneous_appointments: false,
+    created_at: now(),
+  },
+  {
+    id: 'demo-camila-rocha',
+    name: 'Camila Rocha',
+    specialty: 'Maquiadora',
+    photo_url: null,
+    image: null,
+    active: true,
+    status: 'active',
+    whatsapp_message: 'Olá! Seu agendamento com Camila Rocha foi confirmado.',
+    allow_simultaneous_appointments: false,
+    created_at: now(),
+  },
+];
+
+const DEMO_SERVICES: Row[] = [
+  { id: 'demo-service-ana-corte', professional_id: 'demo-ana-clara', name: 'Corte e Escova', duration: 60, price: 80, active: true, status: 'active', created_at: now() },
+  { id: 'demo-service-ana-coloracao', professional_id: 'demo-ana-clara', name: 'Coloração', duration: 120, price: 150, active: true, status: 'active', created_at: now() },
+  { id: 'demo-service-ana-maquiagem', professional_id: 'demo-ana-clara', name: 'Maquiagem', duration: 90, price: 120, active: true, status: 'active', created_at: now() },
+  { id: 'demo-service-beatriz-manicure', professional_id: 'demo-beatriz-souza', name: 'Manicure', duration: 45, price: 40, active: true, status: 'active', created_at: now() },
+  { id: 'demo-service-beatriz-maquiagem', professional_id: 'demo-beatriz-souza', name: 'Maquiagem', duration: 90, price: 120, active: true, status: 'active', created_at: now() },
+  { id: 'demo-service-camila-maquiagem', professional_id: 'demo-camila-rocha', name: 'Maquiagem', duration: 90, price: 120, active: true, status: 'active', created_at: now() },
+];
+
+const createDemoWeeklySchedule = () => {
+  const weekdays = [
+    { weekday: 'monday', day: 1, enabled: true, start: '08:00', end: '18:00', lunchStart: '12:00', lunchEnd: '13:00' },
+    { weekday: 'tuesday', day: 2, enabled: true, start: '08:00', end: '18:00', lunchStart: '12:00', lunchEnd: '13:00' },
+    { weekday: 'wednesday', day: 3, enabled: true, start: '08:00', end: '18:00', lunchStart: '12:00', lunchEnd: '13:00' },
+    { weekday: 'thursday', day: 4, enabled: true, start: '08:00', end: '18:00', lunchStart: '12:00', lunchEnd: '13:00' },
+    { weekday: 'friday', day: 5, enabled: true, start: '08:00', end: '18:00', lunchStart: '12:00', lunchEnd: '13:00' },
+    { weekday: 'saturday', day: 6, enabled: true, start: '08:00', end: '12:00', lunchStart: null, lunchEnd: null },
+    { weekday: 'sunday', day: 0, enabled: false, start: '09:00', end: '14:00', lunchStart: null, lunchEnd: null },
+  ];
+
+  return DEMO_PROFESSIONALS.flatMap((professional) =>
+    weekdays.map((rule) => ({
+      id: `demo-weekly-${professional.id}-${rule.weekday}`,
+      professional_id: professional.id,
+      weekday: rule.day,
+      week_day: rule.weekday,
+      day_of_week: rule.weekday,
+      day: rule.weekday,
+      enabled: rule.enabled,
+      start: rule.start,
+      end: rule.end,
+      start_time: rule.start,
+      end_time: rule.end,
+      interval_minutes: 30,
+      has_lunch_break: Boolean(rule.lunchStart && rule.lunchEnd),
+      lunch_start: rule.lunchStart,
+      lunch_end: rule.lunchEnd,
+      created_at: now(),
+    })),
+  );
+};
+
 const defaultDb = (): Db => ({
-  professionals: [],
-  services: [],
+  professionals: DEMO_PROFESSIONALS,
+  services: DEMO_SERVICES,
   appointments: [],
-  weekly_schedule: [],
+  weekly_schedule: createDemoWeeklySchedule(),
   schedule_blocks: [],
   blocked_clients: [],
   clients: [],
@@ -43,7 +125,24 @@ const ensureTables = (db: Partial<Db>): Db => {
   }, {} as Db);
 };
 
+
+const seedDemoDataIfEmpty = (db: Db) => {
+  const hasProfessionals = Array.isArray(db.professionals) && db.professionals.length > 0;
+  const hasServices = Array.isArray(db.services) && db.services.length > 0;
+
+  if (!hasProfessionals) db.professionals = [...DEMO_PROFESSIONALS];
+  if (!hasServices) db.services = [...DEMO_SERVICES];
+
+  if (!Array.isArray(db.weekly_schedule) || db.weekly_schedule.length === 0) {
+    db.weekly_schedule = createDemoWeeklySchedule();
+  }
+
+  return db;
+};
+
 const normalizeStoredDb = (db: Db) => {
+  seedDemoDataIfEmpty(db);
+
   db.site_config = (db.site_config || []).map((item) => {
     const siteConfig = item.config?.siteConfig;
     if (!siteConfig) return item;

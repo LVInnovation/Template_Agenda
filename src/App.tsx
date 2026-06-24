@@ -1,14 +1,28 @@
 import { useEffect } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import AppRoutes from './routes/AppRoutes'
-import { applyThemePreset } from './config/appConfig'
 import { loadSiteConfigFromDatabase } from './services/siteConfig'
-import { loadTemplatePreferences } from './services/templatePreferences'
+import { TEMPLATE_PREFERENCES_EVENT, loadTemplatePreferences } from './services/templatePreferences'
+import { applyThemeColors } from './utils/themeColors'
 
 function App() {
   useEffect(() => {
-    applyThemePreset(loadTemplatePreferences().paletteId)
-    loadSiteConfigFromDatabase().catch(() => applyThemePreset(loadTemplatePreferences().paletteId))
+    const applySavedTheme = () => {
+      const preferences = loadTemplatePreferences()
+      applyThemeColors(preferences.themeColors, preferences.paletteId)
+    }
+
+    const handleThemeChange = () => {
+      applySavedTheme()
+    }
+
+    applySavedTheme()
+    loadSiteConfigFromDatabase().catch(() => applySavedTheme())
+    window.addEventListener(TEMPLATE_PREFERENCES_EVENT, handleThemeChange)
+
+    return () => {
+      window.removeEventListener(TEMPLATE_PREFERENCES_EVENT, handleThemeChange)
+    }
   }, [])
 
   return (

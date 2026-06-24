@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'node_modules'],
+    ignores: ['dist', 'node_modules', '*.timestamp-*.mjs', 'vite.config.ts.timestamp-*.mjs'],
   },
   {
     files: ['**/*.{js,cjs,mjs}'],

@@ -3,50 +3,75 @@
 @tailwind utilities;
 
 :root {
-  --color-gold-50: 253 251 247;
-  --color-gold-100: 250 246 237;
-  --color-gold-200: 244 228 166;
-  --color-gold-300: 229 199 107;
-  --color-gold-400: 212 175 55;
-  --color-gold-500: 201 162 39;
-  --color-gold-600: 184 152 32;
-  --color-gold-700: 160 134 27;
-  --color-gold-800: 135 106 21;
-  --color-gold-900: 107 84 16;
-  --color-primary-50: 253 251 247;
-  --color-primary-100: 250 246 237;
-  --color-primary-200: 244 228 166;
-  --color-primary-300: 229 199 107;
-  --color-primary-400: 212 175 55;
-  --color-primary-500: 201 162 39;
-  --color-primary-600: 184 152 32;
-  --color-primary-700: 160 134 27;
-  --color-primary-800: 135 106 21;
-  --color-primary-900: 107 84 16;
-  --color-dark-50: 245 245 245;
-  --color-dark-100: 232 232 232;
-  --color-dark-200: 209 209 209;
-  --color-dark-300: 180 180 180;
-  --color-dark-400: 139 139 139;
-  --color-dark-500: 102 102 102;
-  --color-dark-600: 36 36 36;
-  --color-dark-700: 30 30 30;
+  --color-gold-50: 255 251 235;
+  --color-gold-100: 252 243 207;
+  --color-gold-200: 246 225 164;
+  --color-gold-300: 231 201 117;
+  --color-gold-400: 214 189 130;
+  --color-gold-500: 194 157 82;
+  --color-gold-600: 159 124 57;
+  --color-gold-700: 127 97 45;
+  --color-gold-800: 94 70 33;
+  --color-gold-900: 60 44 22;
+  --color-primary-50: 255 251 235;
+  --color-primary-100: 252 243 207;
+  --color-primary-200: 246 225 164;
+  --color-primary-300: 231 201 117;
+  --color-primary-400: 214 189 130;
+  --color-primary-500: 194 157 82;
+  --color-primary-600: 159 124 57;
+  --color-primary-700: 127 97 45;
+  --color-primary-800: 94 70 33;
+  --color-primary-900: 60 44 22;
+  --color-dark-50: 248 245 234;
+  --color-dark-100: 225 221 207;
+  --color-dark-200: 185 179 164;
+  --color-dark-300: 128 122 109;
+  --color-dark-400: 86 82 74;
+  --color-dark-500: 56 54 50;
+  --color-dark-600: 41 41 41;
+  --color-dark-700: 31 31 31;
   --color-dark-800: 24 24 24;
   --color-dark-900: 18 18 18;
-  --app-text-strong: #f8f5ea;
-  --app-text-body: #e1ddcf;
-  --app-text-muted: #c5c0b4;
-  --app-text-subtle: #9d988e;
-  --app-on-accent: #15130d;
-  --app-border: rgba(212, 175, 55, 0.22);
-  --app-background: #121212;
-  --app-background-accent: rgba(212, 175, 55, 0.08);
-  --app-scrollbar-track: #181818;
-  --app-success: #86efac;
-  --app-danger: #fca5a5;
-  --app-warning: #fde68a;
-  color: var(--app-text-body);
-  background: var(--app-background);
+  --color-primary: #d6bd82;
+  --color-primary-hover: #e4cc96;
+  --color-primary-foreground: #17130d;
+  --color-secondary: #181818;
+  --color-secondary-foreground: #f8f5ea;
+  --color-accent: #a9915e;
+  --color-accent-foreground: #0f172a;
+  --color-background: #121212;
+  --color-background-foreground: #f8f5ea;
+  --color-surface: #1f1f1f;
+  --color-surface-foreground: #f8f5ea;
+  --color-surface-alt: #292929;
+  --color-surface-elevated: #313131;
+  --color-text: #f8f5ea;
+  --color-text-primary: #f8f5ea;
+  --color-text-secondary: #e1ddcf;
+  --color-text-muted: #b9b3a4;
+  --color-muted: #b9b3a4;
+  --color-border: rgba(214, 189, 130, 0.24);
+  --color-button: #d6bd82;
+  --color-button-foreground: #17130d;
+  --color-input-background: #1f1f1f;
+  --color-input-foreground: #f8f5ea;
+  --color-sidebar: #181818;
+  --color-sidebar-foreground: #f8f5ea;
+  --app-text-strong: var(--color-text-primary);
+  --app-text-body: var(--color-text-secondary);
+  --app-text-muted: var(--color-text-muted);
+  --app-text-subtle: var(--color-text-muted);
+  --app-on-accent: var(--color-primary-foreground);
+  --app-border: var(--color-border);
+  --app-background: var(--color-background);
+  --app-background-accent: rgba(214, 189, 130, 0.16);
+  --app-scrollbar-track: var(--color-surface-alt);
+  --app-success: #16a34a;
+  --app-danger: #dc2626;
+  --app-warning: #ca8a04;
+  color: var(--color-text);
+  background: var(--color-background);
 }
 
 html,
@@ -58,10 +83,10 @@ body,
 body {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background:
-    radial-gradient(circle at 20% 50%, var(--app-background-accent), transparent 35%),
-    radial-gradient(circle at 80% 80%, color-mix(in srgb, var(--app-background-accent) 70%, transparent), transparent 35%),
-    linear-gradient(135deg, rgb(var(--color-dark-900)) 0%, rgb(var(--color-dark-800)) 34%, rgb(var(--color-dark-700)) 68%, rgb(var(--color-dark-900)) 100%);
-  color: var(--app-text-body);
+    radial-gradient(circle at 20% 18%, var(--app-background-accent), transparent 34%),
+    radial-gradient(circle at 82% 76%, color-mix(in srgb, var(--color-accent) 16%, transparent), transparent 32%),
+    linear-gradient(135deg, var(--color-background) 0%, var(--color-surface) 52%, var(--color-background) 100%);
+  color: var(--color-text);
   min-height: 100vh;
 }
 
@@ -110,7 +135,7 @@ textarea:focus-visible {
 }
 
 ::placeholder {
-  color: var(--app-text-subtle);
+  color: var(--color-text-muted);
 }
 
 * {
@@ -125,7 +150,16 @@ textarea:focus-visible {
 .bg-gray-50,
 .bg-gray-100,
 .bg-gray-200 {
-  background-color: rgb(var(--color-dark-700)) !important;
+  background-color: var(--color-surface) !important;
+  color: var(--color-surface-foreground) !important;
+}
+
+.bg-dark-500,
+.bg-dark-600,
+.bg-dark-700,
+.bg-dark-800,
+.bg-dark-900 {
+  color: var(--color-surface-foreground) !important;
 }
 
 .text-black,
@@ -134,37 +168,37 @@ textarea:focus-visible {
 .text-gray-700,
 .text-gray-100,
 .text-gray-200 {
-  color: var(--app-text-strong) !important;
+  color: var(--color-text-primary) !important;
 }
 
 .text-gray-600,
 .text-gray-500,
 .text-gray-300 {
-  color: var(--app-text-body) !important;
+  color: var(--color-text-secondary) !important;
 }
 
 .text-gray-400 {
-  color: var(--app-text-muted) !important;
+  color: var(--color-text-muted) !important;
 }
 
 .text-dark-900,
 .text-dark-800,
 .text-dark-700,
 .text-dark-600 {
-  color: var(--app-on-accent) !important;
+  color: var(--color-primary-foreground) !important;
 }
 
 .border-gray-100,
 .border-gray-200,
 .border-gray-300,
 .border-gray-400 {
-  border-color: var(--app-border) !important;
+  border-color: var(--color-border) !important;
 }
 
 .text-pink-500,
 .text-pink-600,
 .text-pink-700 {
-  color: rgb(var(--color-gold-400)) !important;
+  color: var(--color-primary) !important;
 }
 
 .border-pink-100,
@@ -174,15 +208,50 @@ textarea:focus-visible {
 }
 
 .bg-pink-50 {
-  background-color: color-mix(in srgb, rgb(var(--color-gold-400)) 8%, transparent) !important;
+  background-color: color-mix(in srgb, var(--color-primary) 8%, transparent) !important;
 }
 
 .bg-pink-100 {
-  background-color: color-mix(in srgb, rgb(var(--color-gold-400)) 12%, transparent) !important;
+  background-color: color-mix(in srgb, var(--color-primary) 12%, transparent) !important;
 }
 
 .hover\:bg-pink-600:hover {
-  background-color: rgb(var(--color-gold-400)) !important;
+  background-color: var(--color-primary) !important;
+}
+
+.text-gold-300,
+.text-gold-400,
+.text-gold-500,
+.text-gold-600 {
+  color: var(--color-primary) !important;
+}
+
+.bg-gold-300,
+.bg-gold-400,
+.bg-gold-400\/100 {
+  background-color: var(--color-primary) !important;
+  color: var(--color-primary-foreground) !important;
+}
+
+.hover\:bg-gold-300:hover,
+.hover\:bg-gold-400:hover {
+  background-color: var(--color-primary-hover) !important;
+}
+
+.bg-gold-400\/5 {
+  background-color: color-mix(in srgb, var(--color-primary) 5%, transparent) !important;
+}
+
+.bg-gold-400\/10 {
+  background-color: color-mix(in srgb, var(--color-primary) 10%, transparent) !important;
+}
+
+.bg-gold-400\/15 {
+  background-color: color-mix(in srgb, var(--color-primary) 15%, transparent) !important;
+}
+
+.bg-gold-400\/20 {
+  background-color: color-mix(in srgb, var(--color-primary) 20%, transparent) !important;
 }
 
 .bg-red-50 {

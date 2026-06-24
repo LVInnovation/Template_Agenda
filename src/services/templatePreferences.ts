@@ -1,9 +1,11 @@
 import { DEFAULT_THEME_ID, ThemeId, normalizeThemeId } from '../config/appConfig';
 import { BusinessSegmentId, DEFAULT_SEGMENT_ID, getBusinessSegment } from '../config/templatePresets';
+import { ThemeColors, getDefaultThemeColors, normalizeThemeColors } from '../utils/themeColors';
 
 export interface TemplatePreferences {
   segmentId: BusinessSegmentId;
   paletteId: ThemeId;
+  themeColors: ThemeColors;
 }
 
 export const TEMPLATE_PREFERENCES_EVENT = 'template-preferences-updated';
@@ -13,17 +15,29 @@ const STORAGE_KEY = 'template_agendamento_preferences_v1';
 const normalizePreferences = (value?: Partial<TemplatePreferences> | null): TemplatePreferences => ({
   segmentId: getBusinessSegment(value?.segmentId).id,
   paletteId: normalizeThemeId(value?.paletteId || DEFAULT_THEME_ID),
+  themeColors: normalizeThemeColors(
+    value?.themeColors,
+    normalizeThemeId(value?.paletteId || DEFAULT_THEME_ID),
+  ),
 });
 
 export const loadTemplatePreferences = (): TemplatePreferences => {
   if (typeof localStorage === 'undefined') {
-    return normalizePreferences({ segmentId: DEFAULT_SEGMENT_ID, paletteId: DEFAULT_THEME_ID });
+    return normalizePreferences({
+      segmentId: DEFAULT_SEGMENT_ID,
+      paletteId: DEFAULT_THEME_ID,
+      themeColors: getDefaultThemeColors(DEFAULT_THEME_ID),
+    });
   }
 
   try {
     return normalizePreferences(JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'));
   } catch {
-    return normalizePreferences({ segmentId: DEFAULT_SEGMENT_ID, paletteId: DEFAULT_THEME_ID });
+    return normalizePreferences({
+      segmentId: DEFAULT_SEGMENT_ID,
+      paletteId: DEFAULT_THEME_ID,
+      themeColors: getDefaultThemeColors(DEFAULT_THEME_ID),
+    });
   }
 };
 

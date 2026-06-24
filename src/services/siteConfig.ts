@@ -1,12 +1,14 @@
 import { defaultSiteConfig, normalizeSiteConfig, SiteConfig } from '../content/siteContent';
-import { applyThemePreset, SITE_CONFIG_EVENT } from '../config/appConfig';
+import { SITE_CONFIG_EVENT } from '../config/appConfig';
 import { localDataClient } from './localDatabase';
 import { loadTemplatePreferences } from './templatePreferences';
+import { applyThemeColors } from '../utils/themeColors';
 
 export const APP_STATE_TABLE = 'site_config';
 export const APP_STATE_ID = 'template-site-config';
 
 export const loadSiteConfigFromDatabase = async (): Promise<SiteConfig> => {
+  const preferences = loadTemplatePreferences();
   const { data, error } = await localDataClient
     .from(APP_STATE_TABLE)
     .select('config')
@@ -15,18 +17,19 @@ export const loadSiteConfigFromDatabase = async (): Promise<SiteConfig> => {
 
   if (error || !data?.config) {
     const fallback = normalizeSiteConfig(defaultSiteConfig);
-    applyThemePreset(loadTemplatePreferences().paletteId);
+    applyThemeColors(preferences.themeColors, preferences.paletteId);
     return fallback;
   }
 
   const state = data.config as { siteConfig?: Partial<SiteConfig> };
   const config = normalizeSiteConfig(state.siteConfig);
-  applyThemePreset(loadTemplatePreferences().paletteId);
+  applyThemeColors(preferences.themeColors, preferences.paletteId);
   return config;
 };
 
 export const saveSiteConfigToDatabase = async (siteConfig: SiteConfig) => {
   const normalized = normalizeSiteConfig(siteConfig);
+  const preferences = loadTemplatePreferences();
 
   await localDataClient.from(APP_STATE_TABLE).upsert({
     id: APP_STATE_ID,
@@ -34,6 +37,6 @@ export const saveSiteConfigToDatabase = async (siteConfig: SiteConfig) => {
     updated_at: new Date().toISOString(),
   });
 
-  applyThemePreset(normalized.themeId);
+  applyThemeColors(preferences.themeColors, preferences.paletteId);
   window.dispatchEvent(new CustomEvent(SITE_CONFIG_EVENT, { detail: normalized }));
 };

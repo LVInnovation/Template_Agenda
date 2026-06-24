@@ -27,6 +27,7 @@ interface Service {
   name: string;
   duration: string;
   price: string;
+  status?: 'active' | 'inactive';
 }
 
 interface DaySchedule {
@@ -83,6 +84,8 @@ type DatabaseService = {
   name: string;
   duration: number | string | null;
   price: number | string | null;
+  active?: boolean | null;
+  status?: string | null;
 };
 
 type DatabaseWeeklySchedule = {
@@ -192,11 +195,16 @@ const mapDatabaseProfessional = (
     image: professional.image || fallbackImages[index % fallbackImages.length] || DEFAULT_PROFESSIONAL_IMAGE,
     services: services
       .filter((service) => service.professional_id === professional.id)
+      .filter((service) => {
+        const status = String(service.status || (service.active === false ? 'inactive' : 'active')).toLowerCase();
+        return service.active !== false && status !== 'inactive' && status !== 'inativo';
+      })
       .map((service) => ({
         id: service.id,
         name: service.name,
         duration: `${parseDurationToNumber(service.duration)} min`,
         price: formatPriceFromDatabase(service.price),
+        status: 'active',
       })),
     schedule: weeklyRulesToSchedule(weeklyRules),
     monthlySchedules: [
